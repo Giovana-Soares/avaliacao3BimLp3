@@ -15,10 +15,15 @@ if(modelName == "Product")
 {
     if(modelAction == "List")
     {
-        Console.WriteLine("Product List");
-        foreach (var product in productRepository.GetAll())
+        if(productRepository.GetAll().Count() != 0){
+            foreach(var product in productRepository.GetAll())
+            {
+                Console.WriteLine("{0}, {1}, {2}, {3}", product.Id, product.Name, product.Price, product.Active);
+            } 
+        }
+        else
         {
-            Console.WriteLine("{0}, {1}, {2}, {3}", product.Id, product.Name, product.Price, product.Active);
+            Console.WriteLine("Nenhum produto cadastrado");
         }
     }
 
@@ -47,10 +52,11 @@ if(modelName == "Product")
        if (productRepository.existsById(id) == true)
        {
            productRepository.Delete(id);
+           Console.WriteLine($"Produto {id} removido com sucesso");
        }
        else
        {
-            Console.WriteLine($"Computer com id {id} não existe");
+            Console.WriteLine($"Produto {id} não encontrado");
        }
     }
 
@@ -58,15 +64,97 @@ if(modelName == "Product")
     {
         
         int id = Convert.ToInt32(args[2]);
-        if (productRepository.existsById(id) == true)
+        if (productRepository.existsById(id))
         {
            productRepository.Enable(id);
+           Console.WriteLine($"Produto id {id} habilitado com sucesso ");
         }
         else
         {
-            Console.WriteLine($"Produto com id {id} não existe");
+           Console.WriteLine($"Produto {id} não encontrado");
         }
-
+    }
+    
+    if(modelAction == "Disable")
+    {
+        
+        int id = Convert.ToInt32(args[2]);
+        if (productRepository.existsById(id) == true)
+        {
+           productRepository.Disable(id);
+           Console.WriteLine($"Produto id {id} desabilitado com sucesso ");
+        }
+        else
+        {
+            Console.WriteLine($"Produto {id} não encontrado");
+        }
     }
 
+    if(modelAction == "PriceBetween")
+    {
+        var initialPrice = Convert.ToDouble(args[2]);
+        var endPrice=Convert.ToDouble(args[3]);
+
+        if (productRepository.GetAllWithPriceBetween(initialPrice, endPrice).Any())
+        {
+            foreach(var product in productRepository.GetAllWithPriceBetween(initialPrice, endPrice))
+            {
+                Console.WriteLine("{0}, {1}, {2}, {3}", product.Id, product.Name, product.Price, product.Active);
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Nenhum produto encontrado dentro do intervalo de preço R$ {initialPrice } e R$ {endPrice}");
+        }
+    }
+    
+    if(modelAction == "PriceHigherThan")
+    {
+        double price = Convert.ToDouble(args[2]);
+
+        if(productRepository.GetAllWithPriceHigherThan(price).Any())
+        {
+            foreach(var product in productRepository.GetAllWithPriceHigherThan(price))
+            {
+                Console.WriteLine("{0}, {1}, {2}, {3}", product.Id, product.Name, product.Price, product.Active);
+            }
+        }
+        else
+        {
+             Console.WriteLine($"Nenhum produto encontrado com o preço maior que R${price}");
+        }
+    }
+
+
+    if(modelAction == "PriceLowerThan")
+    {
+    double price = Convert.ToDouble(args[2]);  
+    
+        if(productRepository.GetAllWithPriceLowerThan(price).Any())
+        {
+            foreach(var product in productRepository.GetAllWithPriceLowerThan(price))
+            {
+                Console.WriteLine("{0}, {1}, {2}, {3}", product.Id, product.Name, product.Price, product.Active);
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Nenhum produto encontrado com o preço menor que R${price}");
+        }
+    }
+
+    if(modelAction == "AveragePrice")
+    {
+        Console.WriteLine("AveragePrice");
+        
+        if(productRepository.GetAll().Any())
+        {
+            var mediaPrices= productRepository.GetAveragePrice();
+            Console.WriteLine($"A média dos preços é {mediaPrices}");
+        }
+        else
+        {
+            Console.WriteLine("Nenhum produto cadastrado");
+        }
+    }
 }
